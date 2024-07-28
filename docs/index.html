@@ -1,44 +1,91 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="./favicon.png" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		
-		<link rel="modulepreload" href="./_app/immutable/entry/start.DAFCkOvj.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/entry.Cah3l8dC.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/scheduler.BvLojk_z.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.Db7sfzBK.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index.BCbeeufj.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/0.BzTaNiRY.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/2.BbgynQPF.js">
-	</head>
-	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">  <h3 data-svelte-h="svelte-ajq5k0">Rep Timer</h3> <p>0</p> <button data-svelte-h="svelte-1fndxwd">Start</button> <button data-svelte-h="svelte-jn3jzs">Reset</button> 
-			
-			<script>
-				{
-					__sveltekit_bzpooi = {
-						base: new URL(".", location).pathname.slice(0, -1)
-					};
 
-					const element = document.currentScript.parentElement;
+<head>
+	<meta charset="utf-8" />
+	<link rel="icon" href="./favicon.png" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
 
-					const data = [null,null];
+<body>
+	<div style="display: contents;">
+		<h3 data-svelte-h="svelte-ajq5k0">Rep Timer</h3>
+		<p>Timer: <span id="time">0</span></p>
+		<p>Reps: <span id="reps">0</span></p>
+		<button id="start-stop">Stop</button>
+		<button id="reset">Reset</button>
+	</div>
+	<script>
+		console.log("test");
+		const TIMER_MAX = 10;
+		const TIMER_MIN = 0;
+		let time = 0;
+		let reps = 0;
+		let direction = "asc";
+		/**
+		 * @type {number | undefined}
+		 */
+		let interval;
+		let timeDisplay = document.querySelector("#time");
+		let repDisplay = document.querySelector("#reps");
+		let startStopButton = document.querySelector("#start-stop");
+		let resetButton = document.querySelector("#reset");
 
-					Promise.all([
-						import("./_app/immutable/entry/start.DAFCkOvj.js"),
-						import("./_app/immutable/entry/app.Db7sfzBK.js")
-					]).then(([kit, app]) => {
-						kit.start(app, element, {
-							node_ids: [0, 2],
-							data,
-							form: null,
-							error: null
-						});
-					});
-				}
-			</script>
-		</div>
-	</body>
+		let incrementTimer = () => {
+			if (direction === "asc") {
+				time = time + 1;
+			} else if (direction === "dsc") {
+				time = time - 1;
+			}
+
+			timeDisplay.innerHTML = time;
+
+			if (time === TIMER_MAX) {
+				direction = "dsc";
+				reps = reps + 1;
+				repDisplay.innerHTML = reps;
+			} else if (time === TIMER_MIN) {
+				direction = "asc";
+				reps = reps + 1;
+				repDisplay.innerHTML = reps;
+			}
+		};
+
+		let startTimer = () => {
+			interval = setInterval(incrementTimer, 1000);
+		};
+
+		let stopTimer = () => {
+			clearInterval(interval);
+			interval = undefined;
+			startStopButton.innerHTML = "Start";
+		};
+
+		let startStopTimer = () => {
+			console.log("test");
+			if (interval === undefined) {
+				interval = setInterval(incrementTimer, 1000);
+				startStopButton.innerHTML = "Stop";
+			} else {
+				clearInterval(interval);
+				interval = undefined;
+				startStopButton.innerHTML = "Start";
+			}
+		};
+
+		let reset = () => {
+			stopTimer();
+			time = 0;
+			reps = 0;
+			timeDisplay.innerHTML = time;
+			repDisplay.innerHTML = reps;
+		};
+
+		startStopButton.addEventListener("click", startStopTimer);
+		resetButton.addEventListener("click", reset);
+
+		interval = setInterval(incrementTimer, 1000);
+	</script>
+</body>
+
 </html>
